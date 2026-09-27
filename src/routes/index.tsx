@@ -1,11 +1,17 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/")({
-  beforeLoad: async () => {
-    // A página inicial redireciona com base no estado de autenticação.
-    // Componentes inside/outsideProtected substituem esse redirect por agora.
-  },
+  head: () => ({
+    meta: [
+      { title: "MapFin — Controle financeiro pessoal" },
+      { name: "description", content: "Acesse seu controle financeiro pessoal MapFin." },
+      { property: "og:title", content: "MapFin — Controle financeiro pessoal" },
+      { property: "og:description", content: "Acesse seu controle financeiro pessoal MapFin." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: HomeRedirect,
 });
 
@@ -13,11 +19,7 @@ function HomeRedirect() {
   const { user, loading } = useAuth();
 
   if (!loading) {
-    if (user) {
-      throw redirect({ to: "/dashboard" });
-    } else {
-      throw redirect({ to: "/login" });
-    }
+    return <Navigate to={user ? "/dashboard" : "/login"} replace />;
   }
 
   return (
