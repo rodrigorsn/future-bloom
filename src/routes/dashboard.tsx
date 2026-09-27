@@ -40,6 +40,7 @@ function DashboardPage() {
   const { data: transactions, isLoading } = useQuery({
     queryKey: ["transactions", format(selectedMonth, "yyyy-MM")],
     queryFn: async () => {
+      if (!user) return [];
       const { data, error } = await supabase
         .from("transactions")
         .select(`*, category:categories(name, icon, color), item:items(name, icon, color)`)
