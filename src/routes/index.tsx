@@ -1,24 +1,28 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { useAuth } from "@/lib/auth";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  beforeLoad: async () => {
+    // A página inicial redireciona com base no estado de autenticação.
+    // Componentes inside/outsideProtected substituem esse redirect por agora.
+  },
+  component: HomeRedirect,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function HomeRedirect() {
+  const { user, loading } = useAuth();
+
+  if (!loading) {
+    if (user) {
+      throw redirect({ to: "/dashboard" });
+    } else {
+      throw redirect({ to: "/login" });
+    }
+  }
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="flex min-h-screen items-center justify-center bg-[#fcfbf8]">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-amber-500 border-t-transparent" />
     </div>
   );
 }
